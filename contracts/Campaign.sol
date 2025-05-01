@@ -14,8 +14,11 @@ contract Campaign {
     uint256 public votingStart;
     uint256 public votingEnd;
     uint256 public campaign_number = 0;
+    string public campaign_name = "Campaign Name";
+    string public campaign_description = "Campaign Description";
+    uint256 public campaign_duration = 0;
 
-    constructor(string[] memory _candidateNames, uint256 _durationInMinutes, address _creator, uint256 _campaign_number) {
+    constructor(string[] memory _candidateNames, uint256 _durationInMinutes, address _creator, uint256 _campaign_number , string memory _campaign_name, string memory _campaign_description,uint256 startTime) {
         for (uint256 i = 0; i < _candidateNames.length; i++) {
             candidates.push(Candidate({
                 name: _candidateNames[i],
@@ -23,9 +26,12 @@ contract Campaign {
             }));
         }
         campaign_number= _campaign_number;
+        campaign_name = _campaign_name;
+        campaign_description = _campaign_description;
+        campaign_duration = _durationInMinutes;
         owner = _creator;
-        votingStart = block.timestamp;
-        votingEnd = block.timestamp + (_durationInMinutes * 1 minutes);
+        votingStart = startTime;
+        votingEnd = startTime + (_durationInMinutes * 1 minutes);
     }
 
     modifier onlyOwner() {
@@ -65,5 +71,11 @@ contract Campaign {
             return votingEnd - votingStart;
         }
         return votingEnd - block.timestamp;
+    }
+    function getStartTime() public view returns (uint256) {
+        return votingStart;
+    }
+    function getEndTime() public view returns (uint256) {
+        return votingEnd;
     }
 }
