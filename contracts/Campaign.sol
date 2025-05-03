@@ -17,8 +17,9 @@ contract Campaign {
     string public campaign_name = "Campaign Name";
     string public campaign_description = "Campaign Description";
     uint256 public campaign_duration = 0;
+    string public date = "Date";
 
-    constructor(string[] memory _candidateNames, uint256 _durationInMinutes, address _creator, uint256 _campaign_number , string memory _campaign_name, string memory _campaign_description,uint256 startTime) {
+    constructor(string[] memory _candidateNames, uint256 _durationInMinutes, address _creator, uint256 _campaign_number , string memory _campaign_name, string memory _campaign_description,uint256 startTime, string memory _date) {
         for (uint256 i = 0; i < _candidateNames.length; i++) {
             candidates.push(Candidate({
                 name: _candidateNames[i],
@@ -32,6 +33,8 @@ contract Campaign {
         owner = _creator;
         votingStart = startTime;
         votingEnd = startTime + (_durationInMinutes * 1 minutes);
+        date = _date;
+        voters[_creator] = true; 
     }
 
     modifier onlyOwner() {
@@ -77,5 +80,45 @@ contract Campaign {
     }
     function getEndTime() public view returns (uint256) {
         return votingEnd;
+    }
+    function getCandidate(uint index) public view returns (string memory, uint256) {
+        require(index < candidates.length, "Invalid index");
+        return (candidates[index].name, candidates[index].voteCount);
+    }
+
+    function getCandidatesCount() public view returns (uint256) {
+        return candidates.length;
+    }
+
+    function getVotersCount() public view returns (uint256) {
+        uint256 voterCount = 0;
+        for (uint256 i = 0; i < candidates.length; i++) {
+            voterCount += candidates[i].voteCount;
+        }
+        return voterCount;
+    }
+    // function to get campaign name
+    function getCampaignName() public view returns (string memory) {
+        return campaign_name;
+    }
+    // function to get campaign description 
+    function getCampaignDescription() public view returns (string memory) {
+        return campaign_description;
+    }
+    // function to get campaign duration
+    function getCampaignDuration() public view returns (uint256) {
+        return campaign_duration;
+    }
+    // function to get campaign date
+    function getCampaignDate() public view returns (string memory) {
+        return date;
+    }
+    // function to get campaign number
+    function getCampaignNumber() public view returns (uint256) {
+        return campaign_number;
+    }
+    // function to get campaign owner
+    function getCampaignOwner() public view returns (address) {
+        return owner;
     }
 }
