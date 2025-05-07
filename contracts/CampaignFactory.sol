@@ -70,15 +70,13 @@ contract CampaignFactory {
         return deployedCampaigns.length;
     }
 
-    
-    
-        function getCampaignById(uint256 _campaignId) public view returns (CampaignMetadata memory) {
-            require(_campaignId < campaignMetadata.length, "Invalid campaign ID");
-            return campaignMetadata[_campaignId];
-        }
-    
-        function getCampaignAddressById(uint256 _campaignId) public view returns (address) {
-            require(_campaignId < deployedCampaigns.length, "Invalid campaign ID");
-            return address(deployedCampaigns[_campaignId]);
-        }
-}   
+    function getCampaignById(uint256 _campaignId) public view returns (CampaignMetadata memory) {
+        require(_campaignId < campaignMetadata.length, "Invalid campaign ID");
+        return campaignMetadata[_campaignId];
+    }
+
+    function getCampaignAddressById(uint256 _campaignId) public view returns (address) {
+        require(_campaignId < deployedCampaigns.length, "Invalid campaign ID");
+        return address(deployedCampaigns[_campaignId]);
+    }
+}
