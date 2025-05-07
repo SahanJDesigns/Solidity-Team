@@ -121,4 +121,14 @@ contract Campaign {
     function getCampaignOwner() public view returns (address) {
         return owner;
     }
+
+    // Function to check if an address is the campaign owner
+    function isOwner(address _address) public view returns (bool) {
+        return _address == owner;
+    }
+
+    // Function to check if an address has already voted
+    function isVoted(address _address) public view returns (bool) {
+        return voters[_address];
+    }
 }
