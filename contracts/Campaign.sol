@@ -9,7 +9,7 @@ contract Campaign {
     }
 
     // Events for real-time updates
-    event VoteCast(address indexed voter, uint256 candidateIndex, uint256 newVoteCount);
+    event VoteCast(uint256 candidateIndex, uint256 newVoteCount);
 
     Candidate[] public candidates;
     address public owner;
@@ -62,7 +62,7 @@ contract Campaign {
         voters[msg.sender] = true;
         
         // Emit event when a vote is cast
-        emit VoteCast(msg.sender, _candidateIndex, candidates[_candidateIndex].voteCount);
+        emit VoteCast(_candidateIndex, candidates[_candidateIndex].voteCount);
     }
 
     function getAllVotesOfCandidates() public view returns (Candidate[] memory) {
