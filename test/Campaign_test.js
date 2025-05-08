@@ -9,9 +9,9 @@ describe("CampaignFactory and Campaign", function () {
   const candidateNames = ["Alice", "Bob", "Charlie"];
   const campaignName = "Presidential Election";
   const campaignDesc = "Vote for the next president";
-  const campaignDuration = 10; // in minutes
+  const campaignDuration = 10; 
   const campaignDate = new Date().toISOString().split("T")[0];
-  
+
   beforeEach(async function () {
     [owner, voter1, voter2] = await ethers.getSigners();
 
