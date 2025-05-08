@@ -156,7 +156,7 @@ describe("CampaignFactory and Campaign", function () {
   });
 
   it("should return campaign number", async function () {
-    expect(await campaign.getCampaignNumber()).to.equal(0); // first one created
+    expect(await campaign.getCampaignNumber()).to.equal(0); 
   });
 
   it("should return total campaign count in factory", async function () {
