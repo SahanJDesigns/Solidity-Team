@@ -28,6 +28,7 @@ contract CampaignFactory {
         string memory _campaign_description,
         uint256 startTime,
         string memory date
+        ,address[] memory _eligible
     ) public {
         Campaign newCampaign = new Campaign(
             _candidateNames,
@@ -37,7 +38,8 @@ contract CampaignFactory {
             _campaign_name,
             _campaign_description,
             startTime,
-            date
+            date,
+            _eligible
 
         );
         CampaignMetadata memory metadata = CampaignMetadata({
@@ -78,5 +80,28 @@ contract CampaignFactory {
     function getCampaignAddressById(uint256 _campaignId) public view returns (address) {
         require(_campaignId < deployedCampaigns.length, "Invalid campaign ID");
         return address(deployedCampaigns[_campaignId]);
+    }
+    function getCampaignsForVoter(address voter) public view returns (address[] memory) {
+        // Count eligible campaigns first
+        uint eligibleCount = 0;
+        for (uint i = 0; i < deployedCampaigns.length; i++) {
+            if (deployedCampaigns[i].isEligibleVoter(voter)) {
+                eligibleCount++;
+            }
+        }
+        
+        // Create array of eligible campaign addresses
+        address[] memory eligibleCampaigns = new address[](eligibleCount);
+        uint currentIndex = 0;
+        
+        // Fill the array
+        for (uint i = 0; i < deployedCampaigns.length; i++) {
+            if (deployedCampaigns[i].isEligibleVoter(voter)) {
+                eligibleCampaigns[currentIndex] = address(deployedCampaigns[i]);
+                currentIndex++;
+            }
+        }
+        
+        return eligibleCampaigns;
     }
 }

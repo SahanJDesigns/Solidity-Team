@@ -21,8 +21,9 @@ contract Campaign {
     string public campaign_description = "Campaign Description";
     uint256 public campaign_duration = 0;
     string public date = "Date";
+    address[] public eligible;
 
-    constructor(string[] memory _candidateNames, uint256 _durationInMinutes, address _creator, uint256 _campaign_number , string memory _campaign_name, string memory _campaign_description,uint256 startTime, string memory _date) {
+    constructor(string[] memory _candidateNames, uint256 _durationInMinutes, address _creator, uint256 _campaign_number , string memory _campaign_name, string memory _campaign_description,uint256 startTime, string memory _date ,address[] memory _eligible) {
         for (uint256 i = 0; i < _candidateNames.length; i++) {
             candidates.push(Candidate({
                 name: _candidateNames[i],
@@ -38,6 +39,9 @@ contract Campaign {
         votingEnd = startTime + (_durationInMinutes * 1 minutes);
         date = _date;
         voters[_creator] = true; 
+        for (uint256 i = 0; i < _eligible.length; i++) {
+            eligible.push(_eligible[i]);
+        }
     }
 
     modifier onlyOwner() {
@@ -137,4 +141,14 @@ contract Campaign {
     function isVoted(address _address) public view returns (bool) {
         return voters[_address];
     }
+    // Function to check if an address is eligible to vote
+    function isEligibleVoter(address voter) public view returns (bool) {
+        for (uint256 i = 0; i < eligible.length; i++) {
+            if (eligible[i] == voter) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
