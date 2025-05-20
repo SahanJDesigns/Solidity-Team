@@ -152,7 +152,7 @@ contract Campaign {
         return _type;
     }
     // Function to check if the campaign is public
-    function isPublic(address voter) public view returns (bool) {
+    function isPublic() public view returns (bool) {
         if (_type == true) {
             return true;
         } else {

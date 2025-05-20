@@ -28,7 +28,7 @@ contract CampaignFactory {
         string memory _campaign_description,
         uint256 startTime,
         string memory date,
-        address[] memory _eligible
+        address[] memory _eligible,
         bool type_
     ) public {
         Campaign newCampaign = new Campaign(
@@ -83,11 +83,12 @@ contract CampaignFactory {
         require(_campaignId < deployedCampaigns.length, "Invalid campaign ID");
         return address(deployedCampaigns[_campaignId]);
     }
+    
     function getCampaignsForVoter(address voter) public view returns (address[] memory) {
         // Count eligible campaigns first
         uint eligibleCount = 0;
         for (uint i = 0; i < deployedCampaigns.length; i++) {
-            if (deployedCampaigns[i].isEligibleVoter(voter) || deployedCampaigns[i].isOwner(voter)|| deployedCampaigns[i].isPublic(voter)) {
+            if (deployedCampaigns[i].isEligibleVoter(voter) || deployedCampaigns[i].isOwner(voter)|| deployedCampaigns[i].isPublic()) {
                 eligibleCount++;
             }
         }
@@ -98,7 +99,7 @@ contract CampaignFactory {
         
         // Fill the array
         for (uint i = 0; i < deployedCampaigns.length; i++) {
-            if (deployedCampaigns[i].isEligibleVoter(voter ) || deployedCampaigns[i].isOwner(voter)|| deployedCampaigns[i].isPublic(voter)) {
+            if (deployedCampaigns[i].isEligibleVoter(voter ) || deployedCampaigns[i].isOwner(voter)|| deployedCampaigns[i].isPublic()) {
                 eligibleCampaigns[currentIndex] = address(deployedCampaigns[i]);
                 currentIndex++;
             }
