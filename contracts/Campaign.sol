@@ -21,9 +21,10 @@ contract Campaign {
     string public campaign_description = "Campaign Description";
     uint256 public campaign_duration = 0;
     string public date = "Date";
-    address[] public eligible;
+    mapping(address => bool) public eligible;
+    bool public _type;
 
-    constructor(string[] memory _candidateNames, uint256 _durationInMinutes, address _creator, uint256 _campaign_number , string memory _campaign_name, string memory _campaign_description,uint256 startTime, string memory _date ,address[] memory _eligible) {
+    constructor(string[] memory _candidateNames, uint256 _durationInMinutes, address _creator, uint256 _campaign_number , string memory _campaign_name, string memory _campaign_description,uint256 startTime, string memory _date ,address[] memory _eligible, bool type_) {
         for (uint256 i = 0; i < _candidateNames.length; i++) {
             candidates.push(Candidate({
                 name: _candidateNames[i],
@@ -40,8 +41,9 @@ contract Campaign {
         date = _date;
         voters[_creator] = true; 
         for (uint256 i = 0; i < _eligible.length; i++) {
-            eligible.push(_eligible[i]);
+            eligible[_eligible[i]] = true;
         }
+        _type = type_; // true for public, false for private
     }
 
     modifier onlyOwner() {
@@ -143,12 +145,19 @@ contract Campaign {
     }
     // Function to check if an address is eligible to vote
     function isEligibleVoter(address voter) public view returns (bool) {
-        for (uint256 i = 0; i < eligible.length; i++) {
-            if (eligible[i] == voter) {
-                return true;
-            }
+        return eligible[voter];
+    }
+    // Function to get the type of campaign
+    function getType() public view returns (bool) {
+        return _type;
+    }
+    // Function to check if the campaign is public
+    function isPublic(address voter) public view returns (bool) {
+        if (_type == true) {
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
 }

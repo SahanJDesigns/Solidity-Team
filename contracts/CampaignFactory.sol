@@ -27,8 +27,9 @@ contract CampaignFactory {
         string memory _campaign_name,
         string memory _campaign_description,
         uint256 startTime,
-        string memory date
-        ,address[] memory _eligible
+        string memory date,
+        address[] memory _eligible
+        bool type_
     ) public {
         Campaign newCampaign = new Campaign(
             _candidateNames,
@@ -39,7 +40,8 @@ contract CampaignFactory {
             _campaign_description,
             startTime,
             date,
-            _eligible
+            _eligible,
+            type_
 
         );
         CampaignMetadata memory metadata = CampaignMetadata({
@@ -85,7 +87,7 @@ contract CampaignFactory {
         // Count eligible campaigns first
         uint eligibleCount = 0;
         for (uint i = 0; i < deployedCampaigns.length; i++) {
-            if (deployedCampaigns[i].isEligibleVoter(voter)) {
+            if (deployedCampaigns[i].isEligibleVoter(voter) || deployedCampaigns[i].isOwner(voter)|| deployedCampaigns[i].isPublic(voter)) {
                 eligibleCount++;
             }
         }
@@ -96,7 +98,7 @@ contract CampaignFactory {
         
         // Fill the array
         for (uint i = 0; i < deployedCampaigns.length; i++) {
-            if (deployedCampaigns[i].isEligibleVoter(voter)) {
+            if (deployedCampaigns[i].isEligibleVoter(voter ) || deployedCampaigns[i].isOwner(voter)|| deployedCampaigns[i].isPublic(voter)) {
                 eligibleCampaigns[currentIndex] = address(deployedCampaigns[i]);
                 currentIndex++;
             }
