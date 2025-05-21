@@ -11,8 +11,11 @@
   "dependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@nomiclabs/hardhat-ethers": "^2.2.2",
+    "@semaphore-protocol/contracts": "^4.11.0",
+    "@semaphore-protocol/core": "^4.11.0",
+    "@semaphore-protocol/hardhat": "^4.11.0",
     "dotenv": "^16.0.3",
-    "hardhat": "^2.13.0",
-    "ethers": "^5.7.1"
+    "ethers": "^5.7.1",
+    "hardhat": "^2.13.0"
   }
 }

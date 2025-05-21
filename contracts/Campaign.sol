@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
+import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
+
 contract Campaign {
     
     struct Candidate {
@@ -23,8 +25,10 @@ contract Campaign {
     string public date = "Date";
     mapping(address => bool) public eligible;
     bool public _type;
+    ISemaphore public semaphore;
+    uint256 public groupId;
 
-    constructor(string[] memory _candidateNames, uint256 _durationInMinutes, address _creator, uint256 _campaign_number , string memory _campaign_name, string memory _campaign_description,uint256 startTime, string memory _date ,address[] memory _eligible, bool type_) {
+    constructor(string[] memory _candidateNames, uint256 _durationInMinutes, address _creator, uint256 _campaign_number , string memory _campaign_name, string memory _campaign_description,uint256 startTime, string memory _date ,address[] memory _eligible, bool type_, ISemaphore _semaphore) {
         for (uint256 i = 0; i < _candidateNames.length; i++) {
             candidates.push(Candidate({
                 name: _candidateNames[i],
@@ -44,6 +48,12 @@ contract Campaign {
             eligible[_eligible[i]] = true;
         }
         _type = type_; // true for public, false for private
+        semaphore = _semaphore;
+        groupId = semaphore.createGroup(address(this));
+    }
+
+    function joinGroup(uint256 identityCommitment) external {
+        semaphore.addMember(groupId, identityCommitment);
     }
 
     modifier onlyOwner() {

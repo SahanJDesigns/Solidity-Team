@@ -2,15 +2,21 @@
 pragma solidity ^0.8.17;
 
 import "./Campaign.sol";
+import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
 
 contract CampaignFactory {
 
     Campaign[] public deployedCampaigns;
     CampaignMetadata[] public campaignMetadata;
+    ISemaphore public semaphore;
 
     event CampaignCreated(address campaignAddress, address creator);
 
     uint Campaign_number = 0;
+
+    constructor(address semaphoreAddress) {
+        semaphore = ISemaphore(semaphoreAddress);
+    }
 
     struct CampaignMetadata {
         uint256 durationInMinutes;
@@ -41,8 +47,8 @@ contract CampaignFactory {
             startTime,
             date,
             _eligible,
-            type_
-
+            type_,
+            semaphore
         );
         CampaignMetadata memory metadata = CampaignMetadata({
 
