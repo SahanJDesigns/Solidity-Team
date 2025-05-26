@@ -1,10 +1,22 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
+// Mock ISemaphore interface for testing
+let mockCampaignAddress;
+
+async function deployMockCampaign() {
+  const MockSemaphore = await ethers.getContractFactory("Campaign");
+  const mockSemaphore = await MockSemaphore.deploy();
+  await mockSemaphore.deployed();
+  mockCampaignAddress = mockSemaphore.address;
+  return mockSemaphore;
+}
+
 describe("CampaignFactory and Campaign", function () {
   let factory, campaignAddress, campaign;
   let owner, voter1, voter2;
   let startTime;
+  let mockSemaphore;
 
   const candidateNames = ["Alice", "Bob", "Charlie"];
   const campaignName = "Presidential Election";
@@ -15,8 +27,11 @@ describe("CampaignFactory and Campaign", function () {
   beforeEach(async function () {
     [owner, voter1, voter2] = await ethers.getSigners();
 
+    // Deploy mock Semaphore contract
+    mockSemaphore = await deployMockCampaign();
+
     const Factory = await ethers.getContractFactory("CampaignFactory");
-    factory = await Factory.deploy();
+    factory = await Factory.deploy(mockSemaphore.address);
     await factory.deployed();
 
     const latestBlock = await ethers.provider.getBlock("latest");
@@ -28,7 +43,9 @@ describe("CampaignFactory and Campaign", function () {
       campaignName,
       campaignDesc,
       startTime,
-      campaignDate
+      campaignDate,
+      [], // eligible voters
+      true // public campaign
     );
 
     const deployedCampaigns = await factory.getDeployedCampaigns();
@@ -167,5 +184,57 @@ describe("CampaignFactory and Campaign", function () {
   it("should return correct campaign address by ID", async function () {
     const addr = await factory.getCampaignAddressById(0);
     expect(addr).to.equal(campaignAddress);
+  });
+
+  // Test 1: Check if a group is created when campaign is created
+  it("should create a Semaphore group when campaign is created", async function () {
+    // Get the group ID from the campaign
+    const groupId = await campaign.groupId();
+    
+    // Verify the group exists using the mock Semaphore contract
+    const groupExists = await mockSemaphore.isGroup(groupId);
+    expect(groupExists).to.equal(true);
+    
+    // Group ID should be non-zero
+    expect(groupId).to.not.equal(0, "Group ID should be assigned");
+  });
+
+  // Test 2: Check if a user can be added to a group
+  it("should allow adding a user to the Semaphore group", async function () {
+    const groupId = await campaign.groupId();
+    
+    // Generate a mock identity commitment (in a real app this would come from ZK proofs)
+    const identityCommitment = ethers.BigNumber.from(ethers.utils.randomBytes(32));
+    
+    // Add the user to the group via Campaign contract
+    await campaign.connect(voter1).joinGroup(identityCommitment);
+    
+    // Check if the user was added to the group in the mock Semaphore
+    const isMember = await mockSemaphore.isMember(groupId, identityCommitment);
+    expect(isMember).to.equal(true);
+    
+    // Check member count
+    const memberCount = await mockSemaphore.getMemberCount(groupId);
+    expect(memberCount).to.equal(1);
+  });
+
+  // Test 3: Check if the same user cannot be added to the group twice
+  it("should prevent adding the same user to a Semaphore group twice", async function () {
+    const groupId = await campaign.groupId();
+    
+    // Generate a mock identity commitment
+    const identityCommitment = ethers.BigNumber.from(ethers.utils.randomBytes(32));
+    
+    // Add the user to the group for the first time
+    await campaign.connect(voter1).joinGroup(identityCommitment);
+    
+    // Attempt to add the same user again
+    await expect(
+      campaign.connect(voter1).joinGroup(identityCommitment)
+    ).to.be.revertedWith("Member already exists");
+    
+    // Check member count is still 1
+    const memberCount = await mockSemaphore.getMemberCount(groupId);
+    expect(memberCount).to.equal(1);
   });
 });
